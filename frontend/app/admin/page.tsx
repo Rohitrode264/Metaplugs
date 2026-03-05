@@ -32,10 +32,22 @@ export default function AdminDashboard() {
         const currentRole = profileData?.role?.toString().trim().toLowerCase();
         const isAdminUser = currentRole === 'admin' || currentRole === 'administrator';
 
-        // Fetch Stats
-        const { count: published } = await supabase.from('posts').select('*', { count: 'exact', head: true }).eq('status', 'published');
-        const { count: pending } = await supabase.from('posts').select('*', { count: 'exact', head: true }).eq('status', 'pending');
-        const { count: drafts } = await supabase.from('posts').select('*', { count: 'exact', head: true }).eq('status', 'draft');
+        // Fetch Stats (Role Aware)
+        let publishedQuery = supabase.from('posts').select('*', { count: 'exact', head: true }).eq('status', 'published');
+        let pendingQuery = supabase.from('posts').select('*', { count: 'exact', head: true }).eq('status', 'pending');
+        let draftsQuery = supabase.from('posts').select('*', { count: 'exact', head: true }).eq('status', 'draft');
+
+        if (!isAdminUser) {
+            publishedQuery = publishedQuery.eq('author_id', user.id);
+            pendingQuery = pendingQuery.eq('author_id', user.id);
+            draftsQuery = draftsQuery.eq('author_id', user.id);
+        }
+
+        const [{ count: published }, { count: pending }, { count: drafts }] = await Promise.all([
+            publishedQuery,
+            pendingQuery,
+            draftsQuery
+        ]);
 
         setStats({
             published: published || 0,
@@ -45,20 +57,36 @@ export default function AdminDashboard() {
 
         // Fetch Content based on role
         if (isAdminUser) {
-            const { data: pending } = await supabase
+            // Admins see EVERYTHING: drafts, pending, published from all users
+            const { data: allPosts, error } = await supabase
                 .from('posts')
-                .select('*, categories(title)')
-                .eq('status', 'pending')
-                .order('created_at', { ascending: false });
-            setDataList(pending || []);
+                .select('*, categories(title), profiles(full_name)')
+                .order('created_at', { ascending: false })
+                .limit(15);
+
+            if (error) {
+                console.error("Dashboard fetch error:", error);
+                const { data: fallbackAll } = await supabase.from('posts').select('*, categories(title)').order('created_at', { ascending: false }).limit(15);
+                setDataList(fallbackAll || []);
+            } else {
+                setDataList(allPosts || []);
+            }
         } else {
-            const { data: recent } = await supabase
+            // Contributors see only their own content
+            const { data: recent, error } = await supabase
                 .from('posts')
-                .select('*, categories(title)')
+                .select('*, categories(title), profiles(full_name)')
                 .eq('author_id', user.id)
                 .order('created_at', { ascending: false })
-                .limit(5);
-            setDataList(recent || []);
+                .limit(10);
+
+            if (error) {
+                console.error("Dashboard fetch error:", error);
+                const { data: fallbackRecent } = await supabase.from('posts').select('*, categories(title)').eq('author_id', user.id).order('created_at', { ascending: false }).limit(10);
+                setDataList(fallbackRecent || []);
+            } else {
+                setDataList(recent || []);
+            }
         }
 
         setLoading(false);
@@ -147,7 +175,7 @@ export default function AdminDashboard() {
                     <div className="p-8 border-b border-slate-50 bg-slate-50/50 flex justify-between items-center">
                         <h2 className="font-black text-slate-900 flex items-center gap-3">
                             {isAdmin ? <ShieldCheck size={20} className="text-blue-600" /> : <Clock size={20} className="text-orange-500" />}
-                            {isAdmin ? 'Administrative Queue' : 'My Recent Activity'}
+                            {isAdmin ? 'All Recent Activity' : 'My Recent Activity'}
                         </h2>
                         <Link href="/admin/posts" className="text-xs font-black uppercase tracking-widest text-blue-600 hover:text-blue-700">View Library</Link>
                     </div>
@@ -173,18 +201,28 @@ export default function AdminDashboard() {
                                                 {post.title}
                                             </Link>
                                             <div className="flex items-center gap-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
+                                                <span className={cn(
+                                                    "px-2 py-0.5 rounded-md font-black",
+                                                    post.post_type === 'news' ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700"
+                                                )}>
+                                                    {post.post_type || 'blog'}
+                                                </span>
+                                                <span className="w-1 h-1 rounded-full bg-slate-200" />
                                                 <span>{post.categories?.title || 'Uncategorized'}</span>
                                                 <span className="w-1 h-1 rounded-full bg-slate-200" />
                                                 <span className={cn(
-                                                    post.status === 'published' ? 'text-green-500' :
-                                                        post.status === 'pending' ? 'text-orange-500' : 'text-slate-400'
+                                                    "px-2 py-0.5 rounded-md font-black",
+                                                    post.status === 'published' ? 'bg-green-100 text-green-700' :
+                                                        (post.status === 'pending' || post.status === 'draft') ? 'bg-orange-100 text-orange-700' : 'bg-slate-200 text-slate-600'
                                                 )}>{post.status}</span>
+                                                <span className="w-1 h-1 rounded-full bg-slate-200" />
+                                                <span className="text-slate-500 italic lowercase font-medium">by {post.profiles?.full_name || 'System'}</span>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div className="flex items-center gap-2">
-                                        {isAdmin && post.status === 'pending' && (
+                                        {isAdmin && (post.status === 'pending' || post.status === 'draft') && (
                                             <button
                                                 onClick={() => handlePublish(post.id)}
                                                 className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 transition-all active:scale-95"

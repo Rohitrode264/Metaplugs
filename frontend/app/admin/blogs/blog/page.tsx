@@ -136,15 +136,6 @@ export default function BlogReviewPage() {
                     >
                         Edit Post
                     </Link>
-                    {post.status !== 'published' && (
-                        <button
-                            onClick={handlePublish}
-                            className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-blue-200 transition-all active:scale-95 flex items-center gap-2"
-                        >
-                            <CheckCircle2 size={18} />
-                            Publish Now
-                        </button>
-                    )}
                 </div>
             </div>
 

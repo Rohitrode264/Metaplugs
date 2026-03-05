@@ -10,7 +10,6 @@ import { useEffect, useState } from 'react';
 const sidebarLinks = [
     { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/admin/posts', label: 'Posts', icon: FileText },
-    { href: '/admin/categories', label: 'Categories', icon: Shield },
     { href: '/admin/users', label: 'Users', icon: Users },
 ];
 

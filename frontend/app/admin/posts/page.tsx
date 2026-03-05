@@ -3,13 +3,14 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabaseClient';
 import Link from 'next/link';
-import { Plus, Edit, Trash2, Eye, CheckCircle2, FileText, Newspaper } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, FileText, Newspaper, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function PostsPage() {
     const [posts, setPosts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [userRole, setUserRole] = useState<string | null>(null);
+    const [userId, setUserId] = useState<string | null>(null);
     const supabase = createClient();
 
     useEffect(() => {
@@ -20,29 +21,56 @@ export default function PostsPage() {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
+        setUserId(user.id);
+
         const { data: profile } = await supabase
             .from('profiles')
             .select('role')
             .eq('id', user.id)
             .single();
 
+        const userRole = profile?.role?.trim().toLowerCase();
+        const isActuallyAdmin = userRole === 'admin';
+
+        // Admins see all posts (published and draft), contributors see only their own posts
         let query = supabase
             .from('posts')
-            .select('*, categories(title)')
+            .select('*, categories(title), profiles(full_name)')
             .order('created_at', { ascending: false });
 
-        const userRoleCheck = profile?.role?.trim().toLowerCase();
-        if (userRoleCheck === 'contributor') {
+        if (!isActuallyAdmin) {
             query = query.eq('author_id', user.id);
         }
 
-        const { data } = await query;
-        if (data) setPosts(data);
+        const { data, error } = await query;
+        if (error) {
+            console.error('Error fetching posts:', error);
+            // Fallback query without profiles if relation name is wrong
+            let fallbackQuery = supabase
+                .from('posts')
+                .select('*, categories(title)')
+                .order('created_at', { ascending: false });
+
+            if (!isActuallyAdmin) {
+                fallbackQuery = fallbackQuery.eq('author_id', user.id);
+            }
+
+            const { data: fallbackData } = await fallbackQuery;
+            if (fallbackData) setPosts(fallbackData);
+        } else if (data) {
+            setPosts(data);
+        }
         if (profile) setUserRole(profile.role);
         setLoading(false);
     };
 
-    const deletePost = async (id: string) => {
+    const deletePost = async (id: string, authorId?: string) => {
+        const isAdmin = userRole?.trim().toLowerCase() === 'admin';
+        const isOwner = authorId === userId;
+        if (!isAdmin && !isOwner) {
+            alert('You can only delete your own posts.');
+            return;
+        }
         if (!confirm('Are you sure you want to delete this post?')) return;
         const { error } = await supabase.from('posts').delete().eq('id', id);
         if (!error) {
@@ -54,13 +82,38 @@ export default function PostsPage() {
     };
 
     const publishPost = async (id: string) => {
+        const isAdmin = userRole?.trim().toLowerCase() === 'admin';
+        if (!isAdmin) {
+            alert('Only admins can publish posts');
+            return;
+        }
         if (!confirm('Publish this post?')) return;
         const { error } = await supabase.from('posts').update({ status: 'published' }).eq('id', id);
         if (!error) fetchPosts();
         else alert('Error publishing post');
     };
 
-    const isAdmin = ['admin', 'administrator'].includes(userRole?.trim().toLowerCase() || '');
+    const unpublishPost = async (id: string) => {
+        const isAdmin = userRole?.trim().toLowerCase() === 'admin';
+        if (!isAdmin) {
+            alert('Only admins can unpublish posts');
+            return;
+        }
+        if (!confirm('Move this post to draft?')) return;
+        const { error } = await supabase.from('posts').update({ status: 'draft' }).eq('id', id);
+        if (!error) fetchPosts();
+        else alert('Error updating post status');
+    };
+
+    const togglePostStatus = async (id: string, currentStatus: string) => {
+        if (currentStatus === 'published') {
+            await unpublishPost(id);
+        } else {
+            await publishPost(id);
+        }
+    };
+
+    const isAdmin = userRole?.trim().toLowerCase() === 'admin';
 
     return (
         <div className="space-y-8 pb-20">
@@ -108,9 +161,17 @@ export default function PostsPage() {
                                                     <Link href={`/admin/blogs/blog?id=${post.id}`} className="font-black text-slate-900 hover:text-blue-600 transition-colors block max-w-xs truncate">
                                                         {post.title}
                                                     </Link>
-                                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
-                                                        {post.post_type || 'blog'} • By System
-                                                    </p>
+                                                    <div className="flex items-center gap-2 mt-0.5">
+                                                        <span className={cn(
+                                                            "text-[10px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded",
+                                                            post.post_type === 'news' ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700"
+                                                        )}>
+                                                            {post.post_type || 'blog'}
+                                                        </span>
+                                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                                            • By {post.profiles?.full_name || 'System User'}
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </td>
@@ -123,31 +184,35 @@ export default function PostsPage() {
                                             <span className={cn(
                                                 "inline-flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border",
                                                 post.status === 'published' ? 'bg-green-50 text-green-700 border-green-100' :
-                                                    post.status === 'pending' ? 'bg-orange-50 text-orange-700 border-orange-100' :
-                                                        'bg-slate-50 text-slate-400 border-slate-100'
+                                                    (post.status === 'pending' || post.status === 'draft') ? 'bg-orange-50 text-orange-700 border-orange-100' :
+                                                        'bg-slate-100 text-slate-700 border-slate-200'
                                             )}>
                                                 <div className={cn("w-1.5 h-1.5 rounded-full",
                                                     post.status === 'published' ? 'bg-green-500' :
-                                                        post.status === 'pending' ? 'bg-orange-500' : 'bg-slate-400'
+                                                        (post.status === 'pending' || post.status === 'draft') ? 'bg-orange-500' : 'bg-slate-500'
                                                 )} />
                                                 {post.status}
                                             </span>
                                         </td>
                                         <td className="px-8 py-6 flex items-center justify-end gap-2">
-                                            <Link href={`/admin/posts/${post.id}/edit`} className="p-3 bg-slate-50 text-slate-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-sm group-hover:bg-white" title="Edit Content">
-                                                <Edit size={18} />
-                                            </Link>
-                                            <button onClick={() => deletePost(post.id)} className="p-3 bg-slate-50 text-slate-400 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-sm group-hover:bg-white" title="Trash Content">
-                                                <Trash2 size={18} />
-                                            </button>
-                                            <Link href={`/admin/blogs/blog?id=${post.id}`} className="p-3 bg-slate-50 text-slate-400 rounded-xl hover:bg-green-600 hover:text-white transition-all shadow-sm group-hover:bg-white" title="Proofread & Review">
+                                            {(isAdmin || post.author_id === userId) && (
+                                                <Link href={`/admin/posts/${post.id}/edit`} className="p-3 bg-slate-50 text-slate-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-sm group-hover:bg-white" title="Edit Content">
+                                                    <Edit size={18} />
+                                                </Link>
+                                            )}
+                                            {(isAdmin || post.author_id === userId) && (
+                                                <button onClick={() => deletePost(post.id, post.author_id)} className="p-3 bg-slate-50 text-slate-400 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-sm group-hover:bg-white" title="Delete Post">
+                                                    <Trash2 size={18} />
+                                                </button>
+                                            )}
+                                            <Link href={`/admin/blogs/blog?id=${post.id}`} className="p-3 bg-slate-50 text-slate-400 rounded-xl hover:bg-slate-200 hover:text-slate-700 transition-all shadow-sm group-hover:bg-white" title="Preview Post">
                                                 <Eye size={18} />
                                             </Link>
-                                            {isAdmin && post.status !== 'published' && (
+                                            {isAdmin && (post.status === 'draft' || post.status === 'pending') && (
                                                 <button
                                                     onClick={() => publishPost(post.id)}
-                                                    className="p-3 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-sm group-hover:bg-white"
-                                                    title="Go Live Now"
+                                                    className="p-3 bg-green-50 text-green-600 rounded-xl hover:bg-green-600 hover:text-white transition-all shadow-sm group-hover:bg-white"
+                                                    title="Publish Post"
                                                 >
                                                     <CheckCircle2 size={18} />
                                                 </button>
