@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+@theme {
+    /* Brand Colors */
+    --color-mp-red: #dc2626;
+    --color-mp-red-dark: #b91c1c;
+    --color-mp-red-light: #fef2f2;
+    --color-mp-black: #0a0a0a;
+    --color-mp-black-soft: #111111;
+
+    /* Font Family */
+    --font-inter: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+    --font-playfair: var(--font-playfair), ui-serif, Georgia, serif;
+}
+
+@utility glass-panel {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+@utility hero-gradient {
+    background: radial-gradient(ellipse at 30% 50%, rgba(220, 38, 38, 0.15) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 20%, rgba(220, 38, 38, 0.08) 0%, transparent 50%);
+}
+
+@layer base {
+    body {
+        @apply bg-white text-mp-black font-inter antialiased;
+        line-height: 1.6;
+    }
+}
+
+/* Custom Animation for Ticker */
+@keyframes ticker {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+.animate-ticker {
+    animation: ticker 30s linear infinite;
+}
+
+/* Custom Animation for Pulse Dot */
+@keyframes pulse-red {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.5;
+        transform: scale(0.8);
+    }
+}
+
+.animate-pulse-red {
+    animation: pulse-red 1.5s ease-in-out infinite;
+}
