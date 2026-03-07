@@ -93,43 +93,68 @@ export default function BlogCard({ post, variant = 'default' }: BlogCardProps) {
     }
 
     return (
-        <Link href={`/blog/${post.id}`} className="flex flex-col h-full bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-mp-red/20 shadow-sm hover:shadow-xl hover:shadow-mp-red/5 transition-all duration-300 group">
-            <div className="aspect-[16/10] w-full overflow-hidden relative">
-                {post.cover_image_url ? (
-                    <img
-                        src={post.cover_image_url}
-                        alt={post.title}
-                        className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
-                    />
-                ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center text-gray-200">
-                        <Tag size={40} />
+        <article className="h-full">
+            <Link
+                href={`/blog/${post.id}`}
+                className="flex flex-col h-full bg-white rounded-2xl overflow-hidden border border-red-50 hover:border-mp-red/20 shadow-sm hover:shadow-xl hover:shadow-mp-red/5 hover:-translate-y-1.5 hover:rotate-[0.5deg] transition-all duration-300 group outline-none focus-visible:ring-2 focus-visible:ring-mp-red focus-visible:ring-offset-2"
+                aria-label={`Read more about ${post.title}`}
+            >
+                <div className="aspect-[16/10] w-full overflow-hidden relative bg-gray-100">
+                    {post.cover_image_url ? (
+                        <img
+                            src={post.cover_image_url}
+                            alt=""
+                            aria-hidden="true"
+                            loading="lazy"
+                            decoding="async"
+                            className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-110"
+                        />
+                    ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-red-50 to-white flex items-center justify-center text-red-100">
+                            <Tag size={40} />
+                        </div>
+                    )}
+                    <div className="absolute top-4 left-4">
+                        {isNews && (
+                            <span className="px-3 py-1 bg-mp-red text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-lg">
+                                News
+                            </span>
+                        )}
                     </div>
-                )}
-                <div className="absolute top-4 left-4">
-                    {isNews && <span className="px-3 py-1 bg-mp-red text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-lg">News</span>}
                 </div>
-            </div>
 
-            <div className="flex flex-col p-5 flex-1">
-                <div className="flex items-center gap-1.5 text-mp-red text-[10px] font-black uppercase tracking-widest mb-3">
-                    <Tag size={10} className="fill-current" /> {categoryTitle}
-                </div>
-                <h3 className="text-lg font-black text-mp-black leading-tight mb-3 group-hover:text-mp-red transition-colors duration-300 line-clamp-2">
-                    {post.title}
-                </h3>
-                {post.excerpt && <p className="text-gray-500 text-sm line-clamp-2 mb-5 leading-relaxed">{post.excerpt}</p>}
-
-                <div className="mt-auto flex items-center justify-between pt-4 border-t border-gray-50">
-                    <div className="flex items-center gap-3 text-gray-400 text-[10px] font-semibold">
-                        <span className="flex items-center gap-1"><Calendar size={12} /> {timeAgo(post.created_at).toUpperCase()}</span>
-                        {post.read_time && <span className="flex items-center gap-1"><Clock size={12} /> {post.read_time} MIN</span>}
+                <div className="flex flex-col p-5 flex-1">
+                    <div className="flex items-center gap-1.5 text-mp-red text-[10px] font-black uppercase tracking-widest mb-3">
+                        <Tag size={10} className="fill-current" aria-hidden="true" /> {categoryTitle}
                     </div>
-                    <span className="text-mp-red font-black text-xs flex items-center gap-1 group-hover:gap-2 transition-all">
-                        READ <ArrowRight size={14} />
-                    </span>
+                    <header>
+                        <h3 className="text-lg font-bold text-mp-black leading-tight mb-3 group-hover:text-mp-red transition-colors duration-300 line-clamp-2">
+                            {post.title}
+                        </h3>
+                    </header>
+                    {post.excerpt && (
+                        <p className="text-gray-500 text-sm line-clamp-2 mb-5 leading-relaxed">
+                            {post.excerpt}
+                        </p>
+                    )}
+
+                    <div className="mt-auto flex items-center justify-between pt-4 border-t border-red-50/50">
+                        <div className="flex items-center gap-3 text-gray-400 text-[10px] font-semibold">
+                            <span className="flex items-center gap-1" title="Published Date">
+                                <Calendar size={12} aria-hidden="true" /> {timeAgo(post.created_at).toUpperCase()}
+                            </span>
+                            {post.read_time && (
+                                <span className="flex items-center gap-1" title="Estimated Read Time">
+                                    <Clock size={12} aria-hidden="true" /> {post.read_time} MIN
+                                </span>
+                            )}
+                        </div>
+                        <span className="text-mp-red font-black text-xs flex items-center gap-1 group-hover:gap-2 transition-all">
+                            READ <ArrowRight size={14} aria-hidden="true" />
+                        </span>
+                    </div>
                 </div>
-            </div>
-        </Link>
+            </Link>
+        </article>
     );
 }

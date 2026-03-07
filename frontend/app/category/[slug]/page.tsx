@@ -92,58 +92,47 @@ export default function CategoryPage() {
     const displayTitle = category?.title || decodeURIComponent(slug?.replace(/-/g, ' ') || '');
 
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-[#FFF8F8]">
             <Navbar />
 
             {/* ── PROFESSIONAL HUB HEADER ─────────────────────────────────── */}
-            <div className="bg-mp-black pt-28 pb-20 relative overflow-hidden">
-                {/* Background Decor */}
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-mp-red/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2" />
-                <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-mp-red/5 rounded-full blur-[80px]" />
+            <header className="bg-[#FFF8F8] pt-20 md:pt-24 pb-12 border-b border-red-50 relative overflow-hidden" aria-labelledby="hub-title">
+                {/* ADVANCED ATTRACTIVE GRADIENT: Red center fading to white */}
+                <div className="absolute inset-0 bg-[#FFF8F8]" aria-hidden="true" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(220,38,38,0.08)_0%,rgba(220,38,38,0.03)_30%,transparent_70%)]" aria-hidden="true" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(ellipse_at_center,rgba(220,38,38,0.05)_0%,transparent_80%)]" aria-hidden="true" />
 
-                <div className="max-w-7xl mx-auto px-6 md:px-10 relative z-10">
-                    {/* Breadcrumbs */}
-                    <div className="flex items-center gap-2 text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] mb-10 overflow-x-auto no-scrollbar whitespace-nowrap">
+                <div className="max-w-7xl mx-auto px-6 md:px-10 relative z-10 text-center">
+                    {/* Breadcrumbs - Centered */}
+                    <nav className="flex items-center justify-center gap-2 text-gray-400 text-[9px] font-black uppercase tracking-[0.2em] mb-6 animate-in fade-in duration-500" aria-label="Breadcrumb">
                         <Link href="/" className="hover:text-mp-red transition-colors">INTEL</Link>
-                        <ChevronRight size={12} className="text-gray-700" />
+                        <ChevronRight size={10} className="text-red-100" />
                         <Link href="/categories" className="hover:text-mp-red transition-colors">HUBS</Link>
-                        <ChevronRight size={12} className="text-gray-700" />
+                        <ChevronRight size={10} className="text-red-100" />
                         <span className="text-mp-red">{displayTitle}</span>
-                    </div>
+                    </nav>
 
-                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-10">
+                    <div className="flex flex-col items-center">
                         <div className="max-w-3xl">
-                            <div className="inline-flex items-center gap-3 text-mp-red text-[10px] font-black uppercase tracking-[0.4em] mb-6">
-                                <span className="w-12 h-[2px] bg-mp-red" /> CATEGORY STREAM
+                            <div className="inline-flex items-center gap-3 text-mp-red text-[10px] font-black uppercase tracking-[0.3em] mb-4 animate-in fade-in zoom-in duration-500">
+                                <span className="w-8 h-[2px] bg-mp-red" /> CATEGORY HUB <span className="w-8 h-[2px] bg-mp-red" />
                             </div>
-                            <h1 className="text-6xl md:text-8xl font-black text-white font-playfair tracking-tight mb-8 leading-[0.9]">
+                            <h1 id="hub-title" className="text-4xl md:text-6xl font-black text-mp-black font-playfair tracking-normal mb-4 leading-tight animate-in fade-in slide-in-from-bottom-4 duration-500 drop-shadow-sm">
                                 {displayTitle}<span className="text-mp-red">.</span>
                             </h1>
                             {category?.description ? (
-                                <p className="text-gray-400 text-xl font-medium leading-relaxed max-w-2xl">
+                                <p className="text-gray-500 text-lg font-medium leading-relaxed max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-6 duration-700">
                                     {category.description}
                                 </p>
                             ) : (
-                                <p className="text-gray-500 text-lg font-medium">
-                                    Deep-dive analysis and professional insights regarding <span className="text-white">{displayTitle}</span> within the global intelligence landscape.
+                                <p className="text-gray-500 text-base md:text-lg font-medium mx-auto animate-in fade-in slide-in-from-bottom-6 duration-700">
+                                    Surgical-grade intelligence regarding <span className="text-mp-black font-bold">{displayTitle}</span> sectors.
                                 </p>
                             )}
                         </div>
-
-                        {/* Hub Stats */}
-                        <div className="flex flex-wrap gap-4 md:flex-col items-start">
-                            <div className="px-6 py-4 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-md">
-                                <div className="text- mp-red font-black text-2xl leading-none mb-1">{posts.length}</div>
-                                <div className="text-gray-500 text-[9px] font-black uppercase tracking-widest">Active Signals</div>
-                            </div>
-                            <div className="px-6 py-4 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-md">
-                                <div className="text-white font-black text-2xl leading-none mb-1">04</div>
-                                <div className="text-gray-500 text-[9px] font-black uppercase tracking-widest">Sub-Tags</div>
-                            </div>
-                        </div>
                     </div>
                 </div>
-            </div>
+            </header>
 
             {/* ── PROFESSIONAL BLOG GRID ──────────────────────────────────── */}
             <section className="py-24 bg-gray-50/20">

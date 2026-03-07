@@ -78,100 +78,75 @@ export default function NewsPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#F6F7F8]">
+        <div className="min-h-screen bg-[#FFF8F8]">
             <Navbar />
 
-            {/* Premium News Header */}
-            <div className="bg-white pt-24 pb-20 relative overflow-hidden border-b border-gray-100">
-                <div className="absolute inset-0 bg-gradient-to-br from-mp-red/[0.03] via-transparent to-transparent opacity-50" />
-                <div className="max-w-7xl mx-auto px-6 md:px-10 relative z-10 text-center">
-                    <div className="inline-flex items-center gap-3 text-mp-red text-[10px] font-black uppercase tracking-[0.4em] mb-6 animate-in fade-in duration-500">
-                        <Newspaper size={14} className="animate-pulse" /> Global Signals
-                    </div>
-                    <h1 className="text-5xl md:text-8xl font-black text-mp-black font-playfair tracking-tight mb-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                        The <span className="text-mp-red">Intercept.</span>
-                    </h1>
-                    <p className="text-gray-500 text-lg md:text-xl max-w-3xl mx-auto font-medium leading-relaxed animate-in fade-in slide-in-from-bottom-4 duration-700">
-                        Real-time intelligence and breaking updates from across the Metaplugs network, delivered with precision.
-                    </p>
-                </div>
-            </div>
+            <main>
+                {/* Premium News Header - ADVANCED ATTRACTIVE SHADING */}
+                <header className="bg-white pt-24 md:pt-32 pb-16 border-b border-red-50 relative overflow-hidden" aria-labelledby="news-title">
+                    <div className="absolute inset-0 bg-[#FFF8F8]" aria-hidden="true" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(220,38,38,0.08)_0%,rgba(220,38,38,0.03)_30%,transparent_70%)]" aria-hidden="true" />
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(ellipse_at_center,rgba(220,38,38,0.05)_0%,transparent_80%)]" aria-hidden="true" />
 
-            {/* Filter Section - Professional Bar */}
-            <div className="sticky top-16 md:top-20 z-40 bg-white/90 backdrop-blur-xl border-b border-gray-100 shadow-sm">
-                <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-6">
-                    <div className="flex items-center gap-4 overflow-x-auto no-scrollbar scroll-smooth">
-                        <div className="flex items-center gap-2 text-gray-400 mr-2 border-r border-gray-100 pr-4">
-                            <Filter size={14} />
-                            <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Feed</span>
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-mp-red text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-full mb-8 animate-in fade-in zoom-in duration-500 shadow-lg shadow-mp-red/20">
+                            <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" aria-hidden="true" />
+                            Live Intelligence Stream
                         </div>
+                        <h1 id="news-title" className="text-5xl md:text-8xl font-black text-mp-black leading-[0.95] tracking-tighter mb-8 font-playfair animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            GLOBAL <br />
+                            <span className="text-mp-red">SIGNALS.</span>
+                        </h1>
+                        <p className="max-w-2xl text-gray-500 text-lg md:text-xl font-medium leading-relaxed mx-auto animate-in fade-in slide-in-from-bottom-6 duration-700">
+                            Real-time data streams from defense tech, global finance, and emerging technologies.
+                        </p>
+                    </div>
+                </header>
+
+                <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16" aria-label="News Feed">
+                    {/* Category Filter */}
+                    <nav className="flex flex-wrap gap-2 mb-16 animate-in fade-in slide-in-from-bottom-4 duration-500" aria-label="News Categories">
                         <button
                             onClick={() => setSelectedHub('all')}
-                            className={`px-5 py-2 text-[10px] font-black uppercase tracking-widest rounded-full transition-all whitespace-nowrap border ${selectedHub === 'all' ? 'bg-mp-red text-white border-mp-red shadow-lg shadow-mp-red/20' : 'text-gray-500 hover:text-mp-black hover:bg-gray-50 border-transparent'}`}
+                            aria-current={selectedHub === 'all' ? 'page' : undefined}
+                            className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${selectedHub === 'all'
+                                ? 'bg-mp-black text-white shadow-xl shadow-mp-black/10 translate-y-[-2px]'
+                                : 'bg-white text-gray-400 hover:text-mp-red border border-red-50'
+                                }`}
                         >
-                            All Streams
+                            All Intel
                         </button>
-                        {hubs.map(hub => (
+                        {hubs.map((hub) => (
                             <button
                                 key={hub.id}
                                 onClick={() => setSelectedHub(hub.id)}
-                                className={`px-5 py-2 text-[10px] font-black uppercase tracking-widest rounded-full transition-all whitespace-nowrap border ${selectedHub === hub.id ? 'bg-mp-red text-white border-mp-red shadow-lg shadow-mp-red/20' : 'text-gray-500 hover:text-mp-black hover:bg-gray-50 border-transparent'}`}
+                                aria-current={selectedHub === hub.id ? 'page' : undefined}
+                                className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${selectedHub === hub.id
+                                    ? 'bg-mp-red text-white shadow-xl shadow-mp-red/10 translate-y-[-2px]'
+                                    : 'bg-white text-gray-400 hover:text-mp-red border border-red-50'
+                                    }`}
                             >
                                 {hub.title}
                             </button>
                         ))}
-                    </div>
+                    </nav>
 
-                    <div className="hidden md:flex items-center gap-2 text-mp-red font-black text-[10px] uppercase tracking-widest bg-mp-red/5 px-4 py-2 rounded-lg border border-mp-red/10">
-                        <Zap size={14} className="fill-current" /> LIVE UPDATE
-                    </div>
-                </div>
-            </div>
-
-            <section className="py-20 md:py-24 bg-gray-50/50 min-h-[600px]">
-                <div className="max-w-7xl mx-auto px-6">
+                    {/* Posts Grid */}
                     {loading && posts.length === 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                            {Array.from({ length: 6 }).map((_, i) => (
-                                <div key={i} className="animate-pulse bg-white rounded-3xl h-[450px] border border-gray-100" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" aria-busy="true" aria-label="Loading news">
+                            {[1, 2, 3, 4, 5, 6].map((i) => (
+                                <div key={i} className="bg-white rounded-3xl h-[400px] animate-pulse border border-red-50" />
                             ))}
                         </div>
-                    ) : posts.length === 0 ? (
-                        <div className="py-32 text-center flex flex-col items-center gap-8 bg-white rounded-[3rem] border border-gray-100 shadow-sm mx-auto max-w-2xl px-10">
-                            <div className="w-24 h-24 bg-mp-red/5 rounded-full flex items-center justify-center text-mp-red/20 scale-110">
-                                <Filter size={48} />
-                            </div>
-                            <div>
-                                <h3 className="text-3xl font-black text-mp-black mb-3">Silent Frequency.</h3>
-                                <p className="text-gray-500 leading-relaxed">No intelligence alerts found matching these parameters. Please adjust your filters or check back for upcoming signals.</p>
-                            </div>
-                            <button
-                                onClick={() => setSelectedHub('all')}
-                                className="text-mp-red font-black text-xs uppercase tracking-widest border-b-2 border-mp-red/20 hover:border-mp-red transition-all"
-                            >
-                                RESET FILTERS
-                            </button>
-                        </div>
-                    ) : (
+                    ) : posts.length > 0 ? (
                         <>
-                            <div className="flex items-center gap-4 mb-16">
-                                <div className="p-3 bg-white border border-gray-100 text-mp-black rounded-xl shadow-sm">
-                                    <LayoutGrid size={20} />
-                                </div>
-                                <div>
-                                    <h2 className="text-2xl font-black text-mp-black font-playfair tracking-tight">Intelligence Stream</h2>
-                                    <p className="text-mp-red text-[10px] font-black uppercase tracking-widest">{posts.length} ACTIVE ALERTS</p>
-                                </div>
-                                <div className="h-px flex-1 bg-gradient-to-r from-gray-200 to-transparent ml-4" />
-                            </div>
-
-                            {/* Uniform Professional Grid */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                                 {posts.map((post, idx) => (
                                     <div
                                         key={post.id}
-                                        className="animate-in fade-in slide-in-from-bottom-4 duration-500"
-                                        style={{ animationDelay: `${idx * 50}ms` }}
+                                        className={`h-full animate-in fade-in duration-700 fill-mode-both ${idx % 2 === 0 ? 'slide-in-from-left-8' : 'slide-in-from-right-8'
+                                            }`}
+                                        style={{ animationDelay: `${idx * 100}ms` }}
                                     >
                                         <BlogCard post={post} />
                                     </div>
@@ -183,39 +158,45 @@ export default function NewsPage() {
                                     <button
                                         onClick={() => setPage(p => p + 1)}
                                         disabled={loading}
-                                        className="px-10 py-5 bg-mp-black hover:bg-mp-red text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-2xl shadow-black/10 hover:shadow-mp-red/20 disabled:bg-gray-200 hover:-translate-y-1"
+                                        className="px-10 py-5 bg-mp-black hover:bg-mp-red text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-2xl shadow-black/10 hover:shadow-mp-red/20 disabled:bg-gray-200 hover:-translate-y-1 active:scale-95"
                                     >
                                         {loading ? 'SYNCHRONIZING...' : 'SCAN NEXT SIGNALS'}
                                     </button>
                                 </div>
                             )}
                         </>
+                    ) : (
+                        <div className="text-center py-32 bg-white rounded-3xl border border-dashed border-red-100 italic">
+                            <p className="text-gray-400 text-sm">No signals detected in this sector. Try resetting filters.</p>
+                            <button onClick={() => setSelectedHub('all')} className="mt-4 text-mp-red font-black text-[10px] uppercase tracking-widest hover:underline">Reset Filters</button>
+                        </div>
                     )}
-                </div>
-            </section>
+                </section>
 
-            {/* Newsletter Interstitial - Pro Design */}
-            <section className="bg-mp-red py-24 relative overflow-hidden border-t border-mp-red/10">
-                <div className="max-w-5xl mx-auto px-6 text-center">
-                    <div className="w-16 h-1 bg-white/20 mx-auto mb-10 rounded-full" />
-                    <h3 className="text-3xl md:text-5xl font-black text-white font-playfair tracking-tight mb-6">
-                        Stay ahead of the <span className="text-mp-black underline decoration-mp-black/10 underline-offset-8">curve.</span>
-                    </h3>
-                    <p className="text-white/80 text-lg mb-12 max-w-2xl mx-auto leading-relaxed">
-                        The world moves fast. Get the most critical intelligence reports delivered directly to your workstation once a week.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-                        <input
-                            type="email"
-                            placeholder="Enter your terminal email..."
-                            className="bg-white/10 border border-white/20 rounded-xl px-5 py-4 text-white text-sm focus:outline-none focus:border-white transition-all flex-1 backdrop-blur-md placeholder:text-white/40 font-bold"
-                        />
-                        <button className="bg-mp-black hover:bg-black/80 text-white font-black text-[10px] uppercase tracking-widest px-8 py-4 rounded-xl shadow-xl shadow-black/20 transition-all active:scale-95">
-                            SUBSCRIBE
-                        </button>
+                {/* Bottom Newsletter CTA */}
+                <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-32" aria-labelledby="newsletter-heading">
+                    <div className="bg-mp-black rounded-[2.5rem] p-12 md:p-20 text-center relative overflow-hidden shadow-2xl">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-mp-red/10 blur-[100px]" aria-hidden="true" />
+                        <h2 id="newsletter-heading" className="text-3xl md:text-5xl font-black text-white font-playfair mb-6 tracking-tighter text-center w-full">
+                            GET THE RAW <span className="text-mp-red italic underline decoration-mp-red/20 underline-offset-8">INTELLIGENCE.</span>
+                        </h2>
+                        <p className="text-gray-400 text-lg mb-10 max-w-xl mx-auto font-medium">
+                            Join the inner circle of analysts receiving our proprietary weekly signal brief.
+                        </p>
+                        <form className="flex flex-col md:flex-row gap-4 max-w-md mx-auto" onSubmit={(e) => e.preventDefault()}>
+                            <input
+                                type="email"
+                                placeholder="YOUR.EMAIL@ANALYST.COM"
+                                aria-label="Email Address for News Brief"
+                                className="flex-1 px-6 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-bold placeholder:text-gray-600 focus:outline-none focus:border-mp-red transition-all text-sm"
+                            />
+                            <button className="px-8 py-4 bg-mp-red text-white font-black text-sm uppercase tracking-widest rounded-xl hover:bg-mp-red-dark transition-all shadow-xl shadow-mp-red/20 active:scale-95">
+                                ACCESS FEED
+                            </button>
+                        </form>
                     </div>
-                </div>
-            </section>
+                </section>
+            </main>
 
             <Footer />
         </div>

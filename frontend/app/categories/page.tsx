@@ -68,20 +68,24 @@ export default function CategoriesPage() {
     }, []);
 
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-[#FFF8F8]">
             <Navbar />
 
-            {/* Hubs Hero */}
-            <div className="bg-mp-black py-24 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-mp-red/10 to-transparent" />
+            {/* Hubs Hero - LIGHT & ATTRACTIVE SHADING */}
+            <div className="bg-white py-24 md:py-32 relative overflow-hidden border-b border-red-50">
+                {/* ADVANCED ATTRACTIVE GRADIENT: Red center fading to white */}
+                <div className="absolute inset-0 bg-[#FFF8F8]" aria-hidden="true" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(220,38,38,0.08)_0%,rgba(220,38,38,0.03)_30%,transparent_70%)]" aria-hidden="true" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(ellipse_at_center,rgba(220,38,38,0.05)_0%,transparent_80%)]" aria-hidden="true" />
+
                 <div className="max-w-7xl mx-auto px-4 md:px-8 relative z-10 text-center">
-                    <div className="inline-flex items-center gap-2 text-mp-red text-[10px] font-black uppercase tracking-[0.3em] mb-4">
-                        <Layers size={14} /> Intelligence Network
+                    <div className="inline-flex items-center gap-2 text-mp-red text-[10px] font-black uppercase tracking-[0.3em] mb-6 animate-in fade-in zoom-in duration-500">
+                        <Layers size={14} aria-hidden="true" /> Intelligence Network
                     </div>
-                    <h1 className="text-5xl md:text-8xl font-black text-white font-playfair tracking-tighter mb-6">
+                    <h1 className="text-5xl md:text-8xl font-black text-mp-black font-playfair tracking-tighter mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                         Global <span className="text-mp-red italic">Hubs.</span>
                     </h1>
-                    <p className="text-gray-400 text-lg md:text-xl max-w-3xl mx-auto font-medium leading-relaxed">
+                    <p className="text-gray-500 text-lg md:text-xl max-w-3xl mx-auto font-medium leading-relaxed animate-in fade-in slide-in-from-bottom-6 duration-700">
                         Navigate the Metaplugs network across specialized operational hubs.
                         From frontier AI to defense technology and global venture capital.
                     </p>

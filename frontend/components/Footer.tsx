@@ -3,7 +3,7 @@ import { Mail, Twitter, Linkedin, Zap, Globe, Github } from 'lucide-react';
 
 export default function Footer() {
     return (
-        <footer className="bg-[#F6F7F8] pt-24 pb-12 border-t border-gray-200 relative overflow-hidden">
+        <footer className="bg-[#FFF8F8] pt-24 pb-12 border-t border-red-50 relative overflow-hidden">
             {/* Decorative bg element */}
             <div className="absolute right-0 bottom-0 w-[500px] h-[500px] bg-mp-red/[0.03] blur-[150px] pointer-events-none" />
 
