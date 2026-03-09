@@ -26,31 +26,31 @@ interface Post {
 
 export default function NewsPage() {
     const [posts, setPosts] = useState<Post[]>([]);
-    const [hubs, setHubs] = useState<Hub[]>([]);
-    const [selectedHub, setSelectedHub] = useState<string>('all');
+    const [analysisPosts, setAnalysisPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(false);
     const PER_PAGE = 12;
 
     useEffect(() => {
-        const fetchHubs = async () => {
-            const supabase = createClient();
-            const { data } = await supabase.from('categories').select('*').order('title');
-            setHubs(data || []);
-        };
-        fetchHubs();
+        fetchTopAnalysis();
     }, []);
 
     useEffect(() => {
-        setPosts([]);
-        setPage(1);
-        fetchNews(1);
-    }, [selectedHub]);
-
-    useEffect(() => {
-        if (page > 1) fetchNews(page);
+        fetchNews(page);
     }, [page]);
+
+    const fetchTopAnalysis = async () => {
+        const supabase = createClient();
+        const { data } = await supabase
+            .from('posts')
+            .select('*, categories(title, slug), profiles(full_name)')
+            .eq('status', 'published')
+            .eq('post_type', 'blog')
+            .order('created_at', { ascending: false })
+            .limit(3);
+        setAnalysisPosts(data || []);
+    };
 
     const fetchNews = async (pageNum: number) => {
         setLoading(true);
@@ -66,10 +66,6 @@ export default function NewsPage() {
             .order('created_at', { ascending: false })
             .range(from, to);
 
-        if (selectedHub !== 'all') {
-            query = query.eq('category_id', selectedHub);
-        }
-
         const { data, count } = await query;
 
         setPosts(prev => pageNum === 1 ? (data || []) : [...prev, ...(data || [])]);
@@ -83,53 +79,46 @@ export default function NewsPage() {
 
             <main>
                 {/* Premium News Header - ADVANCED ATTRACTIVE SHADING */}
-                <header className="bg-white pt-24 md:pt-32 pb-16 border-b border-red-50 relative overflow-hidden" aria-labelledby="news-title">
-                    <div className="absolute inset-0 bg-[#FFF8F8]" aria-hidden="true" />
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(220,38,38,0.08)_0%,rgba(220,38,38,0.03)_30%,transparent_70%)]" aria-hidden="true" />
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(ellipse_at_center,rgba(220,38,38,0.05)_0%,transparent_80%)]" aria-hidden="true" />
-
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-mp-red text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-full mb-8 animate-in fade-in zoom-in duration-500 shadow-lg shadow-mp-red/20">
-                            <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" aria-hidden="true" />
-                            Live Intelligence Stream
+                {/* Ultra-Minimal Title Bar */}
+                <div className="bg-white pt-12 pb-6 border-b border-red-50">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div>
+                                <h1 id="news-title" className="text-2xl font-black text-mp-black tracking-tighter uppercase font-playfair">
+                                    GLOBAL <span className="text-mp-red">SIGNALS.</span>
+                                </h1>
+                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em] mt-1">Live Intelligence Feed</p>
+                            </div>
                         </div>
-                        <h1 id="news-title" className="text-5xl md:text-8xl font-black text-mp-black leading-[0.95] tracking-tighter mb-8 font-playfair animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            GLOBAL <br />
-                            <span className="text-mp-red">SIGNALS.</span>
-                        </h1>
-                        <p className="max-w-2xl text-gray-500 text-lg md:text-xl font-medium leading-relaxed mx-auto animate-in fade-in slide-in-from-bottom-6 duration-700">
-                            Real-time data streams from defense tech, global finance, and emerging technologies.
-                        </p>
                     </div>
-                </header>
+                </div>
+
+                {/* TOP ANALYSIS / BLOGS SECTION */}
+                {analysisPosts.length > 0 && (
+                    <section className="bg-white py-12 border-b border-red-50">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="flex items-center gap-3 text-mp-red text-[10px] font-black uppercase tracking-[0.3em] mb-8">
+                                <span className="w-8 h-[2px] bg-mp-red" /> TOP ANALYSIS <span className="w-8 h-[2px] bg-mp-red" />
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                {analysisPosts.map((post) => (
+                                    <div key={post.id} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                        <BlogCard
+                                            post={{
+                                                ...post,
+                                                title: post.title.length > 60 ? post.title.substring(0, 60) + '...' : post.title
+                                            }}
+                                            variant="compact"
+                                            priority={true}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+                )}
 
                 <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16" aria-label="News Feed">
-                    {/* Category Filter */}
-                    <nav className="flex flex-wrap gap-2 mb-16 animate-in fade-in slide-in-from-bottom-4 duration-500" aria-label="News Categories">
-                        <button
-                            onClick={() => setSelectedHub('all')}
-                            aria-current={selectedHub === 'all' ? 'page' : undefined}
-                            className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${selectedHub === 'all'
-                                ? 'bg-mp-black text-white shadow-xl shadow-mp-black/10 translate-y-[-2px]'
-                                : 'bg-white text-gray-400 hover:text-mp-red border border-red-50'
-                                }`}
-                        >
-                            All Intel
-                        </button>
-                        {hubs.map((hub) => (
-                            <button
-                                key={hub.id}
-                                onClick={() => setSelectedHub(hub.id)}
-                                aria-current={selectedHub === hub.id ? 'page' : undefined}
-                                className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${selectedHub === hub.id
-                                    ? 'bg-mp-red text-white shadow-xl shadow-mp-red/10 translate-y-[-2px]'
-                                    : 'bg-white text-gray-400 hover:text-mp-red border border-red-50'
-                                    }`}
-                            >
-                                {hub.title}
-                            </button>
-                        ))}
-                    </nav>
 
                     {/* Posts Grid */}
                     {loading && posts.length === 0 ? (
@@ -167,8 +156,7 @@ export default function NewsPage() {
                         </>
                     ) : (
                         <div className="text-center py-32 bg-white rounded-3xl border border-dashed border-red-100 italic">
-                            <p className="text-gray-400 text-sm">No signals detected in this sector. Try resetting filters.</p>
-                            <button onClick={() => setSelectedHub('all')} className="mt-4 text-mp-red font-black text-[10px] uppercase tracking-widest hover:underline">Reset Filters</button>
+                            <p className="text-gray-400 text-sm">No signals detected in this sector. Check back later.</p>
                         </div>
                     )}
                 </section>

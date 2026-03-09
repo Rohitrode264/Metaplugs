@@ -15,6 +15,7 @@ interface BlogCardProps {
         read_time?: number;
     };
     variant?: 'default' | 'featured' | 'compact';
+    priority?: boolean;
 }
 
 function timeAgo(dateStr: string): string {
@@ -28,7 +29,7 @@ function timeAgo(dateStr: string): string {
     return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-export default function BlogCard({ post, variant = 'default' }: BlogCardProps) {
+export default function BlogCard({ post, variant = 'default', priority = false }: BlogCardProps) {
     const isNews = post.post_type === 'news';
     const categoryTitle = post.categories?.title || 'Intelligence';
 
@@ -73,7 +74,7 @@ export default function BlogCard({ post, variant = 'default' }: BlogCardProps) {
             <Link href={`/blog/${post.id}`} className="flex items-center gap-4 group py-3 border-b border-gray-100 last:border-0">
                 <div className="w-20 h-16 md:w-24 md:h-20 flex-shrink-0 bg-gray-100 rounded-xl overflow-hidden shadow-sm relative">
                     {post.cover_image_url ? (
-                        <Image src={post.cover_image_url} alt={post.title} fill className="object-cover group-hover:scale-110 transition-transform duration-300" />
+                        <Image src={post.cover_image_url} alt={post.title} fill className="object-cover group-hover:scale-110 transition-transform duration-300" priority={priority} />
                     ) : (
                         <div className="w-full h-full bg-mp-red/5 flex items-center justify-center text-mp-red/30">
                             <Tag size={20} />
@@ -110,6 +111,7 @@ export default function BlogCard({ post, variant = 'default' }: BlogCardProps) {
                             fill
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                             className="object-cover object-top transition-transform duration-500 group-hover:scale-110"
+                            priority={priority}
                         />
                     ) : (
                         <div className="w-full h-full bg-gradient-to-br from-red-50 to-white flex items-center justify-center text-red-100">

@@ -95,70 +95,29 @@ export default function CategoryPage() {
         <div className="min-h-screen bg-[#FFF8F8]">
             <Navbar />
 
-            {/* ── PROFESSIONAL HUB HEADER ─────────────────────────────────── */}
-            <header className="bg-[#FFF8F8] pt-20 md:pt-24 pb-12 border-b border-red-50 relative overflow-hidden" aria-labelledby="hub-title">
-                {/* ADVANCED ATTRACTIVE GRADIENT: Red center fading to white */}
-                <div className="absolute inset-0 bg-[#FFF8F8]" aria-hidden="true" />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(220,38,38,0.08)_0%,rgba(220,38,38,0.03)_30%,transparent_70%)]" aria-hidden="true" />
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(ellipse_at_center,rgba(220,38,38,0.05)_0%,transparent_80%)]" aria-hidden="true" />
-
-                <div className="max-w-7xl mx-auto px-6 md:px-10 relative z-10 text-center">
-                    {/* Breadcrumbs - Centered */}
-                    <nav className="flex items-center justify-center gap-2 text-gray-400 text-[9px] font-black uppercase tracking-[0.2em] mb-6 animate-in fade-in duration-500" aria-label="Breadcrumb">
-                        <Link href="/" className="hover:text-mp-red transition-colors">INTEL</Link>
-                        <ChevronRight size={10} className="text-red-100" />
-                        <Link href="/categories" className="hover:text-mp-red transition-colors">HUBS</Link>
-                        <ChevronRight size={10} className="text-red-100" />
-                        <span className="text-mp-red">{displayTitle}</span>
-                    </nav>
-
-                    <div className="flex flex-col items-center">
-                        <div className="max-w-3xl">
-                            <div className="inline-flex items-center gap-3 text-mp-red text-[10px] font-black uppercase tracking-[0.3em] mb-4 animate-in fade-in zoom-in duration-500">
-                                <span className="w-8 h-[2px] bg-mp-red" /> CATEGORY HUB <span className="w-8 h-[2px] bg-mp-red" />
-                            </div>
-                            <h1 id="hub-title" className="text-4xl md:text-6xl font-black text-mp-black font-playfair tracking-normal mb-4 leading-tight animate-in fade-in slide-in-from-bottom-4 duration-500 drop-shadow-sm">
+            {/* Ultra-Minimal Hub Title */}
+            <header className="bg-white pt-12 pb-8 border-b border-red-50">
+                <div className="max-w-7xl mx-auto px-6 md:px-10">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <div className="text-mp-red text-[10px] font-black uppercase tracking-[0.3em] mb-2">CATEGORY HUB</div>
+                            <h1 id="hub-title" className="text-3xl md:text-5xl font-black text-mp-black font-playfair tracking-tight">
                                 {displayTitle}<span className="text-mp-red">.</span>
                             </h1>
-                            {category?.description ? (
-                                <p className="text-gray-500 text-lg font-medium leading-relaxed max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-6 duration-700">
-                                    {category.description}
-                                </p>
-                            ) : (
-                                <p className="text-gray-500 text-base md:text-lg font-medium mx-auto animate-in fade-in slide-in-from-bottom-6 duration-700">
-                                    Surgical-grade intelligence regarding <span className="text-mp-black font-bold">{displayTitle}</span> sectors.
-                                </p>
-                            )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="w-10 h-10 bg-mp-black text-white rounded-lg flex items-center justify-center shadow-lg">
+                                <LayoutGrid size={18} />
+                            </div>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Hub Intelligence</span>
                         </div>
                     </div>
                 </div>
             </header>
 
-            {/* ── PROFESSIONAL BLOG GRID ──────────────────────────────────── */}
-            <section className="py-24 bg-gray-50/20">
+            {/* ── MINIMAL BLOG GRID ──────────────────────────────────── */}
+            <section className="py-20">
                 <div className="max-w-7xl mx-auto px-6 md:px-10">
-                    {/* Grid Title Bar */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-16 border-b border-gray-100 pb-8">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-mp-black text-white rounded-xl flex items-center justify-center shadow-lg">
-                                <LayoutGrid size={20} />
-                            </div>
-                            <div>
-                                <h2 className="text-2xl font-black text-mp-black font-playfair">Latest Analysis</h2>
-                                <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest">PRIMARY FEED</p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-mp-red mr-2">Quick Access:</span>
-                            {['ANALYST', 'REPORTS', 'DATA'].map(tag => (
-                                <span key={tag} className="px-3 py-1 bg-white border border-gray-100 rounded-lg text-gray-400 text-[9px] font-black uppercase tracking-widest hover:border-mp-red hover:text-mp-red transition-all cursor-pointer">
-                                    #{tag}
-                                </span>
-                            ))}
-                        </div>
-                    </div>
-
                     {loading && page === 1 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                             {Array.from({ length: 6 }).map((_, i) => (
@@ -172,11 +131,8 @@ export default function CategoryPage() {
                             </div>
                             <div>
                                 <h3 className="text-3xl font-black text-mp-black mb-3">Silent Signals.</h3>
-                                <p className="text-gray-500 leading-relaxed max-w-md mx-auto">This intelligence hub is currently in a passive state. We are gathering new data points for <span className="text-mp-black font-bold">{displayTitle}</span>. Check back soon.</p>
+                                <p className="text-gray-500 leading-relaxed max-w-md mx-auto">This intelligence hub is currently in a passive state. Check back soon.</p>
                             </div>
-                            <Link href="/" className="px-8 py-4 bg-mp-red text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-xl shadow-mp-red/20 transition-all hover:scale-105 active:scale-95">
-                                EXPLORE OTHER HUBS
-                            </Link>
                         </div>
                     ) : (
                         <>
@@ -205,36 +161,6 @@ export default function CategoryPage() {
                             )}
                         </>
                     )}
-                </div>
-            </section>
-
-            {/* ── RELATED HUBS SECTION ───────────────────────────────────── */}
-            <section className="py-24 border-t border-gray-100 bg-white">
-                <div className="max-w-7xl mx-auto px-6">
-                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
-                        <div>
-                            <div className="text-mp-red text-[10px] font-black uppercase tracking-[0.3em] mb-4">CONTINUE DISCOVERY</div>
-                            <h2 className="text-4xl md:text-5xl font-black text-mp-black font-playfair tracking-tight">Across the <span className="text-mp-red">Network.</span></h2>
-                        </div>
-                        <Link href="/categories" className="flex items-center gap-2 text-mp-black font-black text-xs uppercase tracking-widest group">
-                            VIEW GLOBAL HUBS <ArrowUpRight size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                        </Link>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {['AI INTERFACE', 'CYBER SEC', 'QUANTUM', 'ROBOTICS'].map(name => (
-                            <div key={name} className="p-8 border border-gray-100 rounded-[2rem] hover:border-mp-red/20 hover:shadow-xl hover:shadow-mp-red/5 transition-all group cursor-pointer bg-white">
-                                <div className="w-12 h-12 bg-mp-red/5 rounded-2xl flex items-center justify-center text-mp-red mb-6 group-hover:bg-mp-red group-hover:text-white transition-all">
-                                    <Hash size={20} />
-                                </div>
-                                <h4 className="text-lg font-black text-mp-black mb-2 group-hover:text-mp-red transition-colors">{name}</h4>
-                                <p className="text-gray-400 text-xs font-medium leading-relaxed mb-6">Explore intelligence focused specifically on {name.toLowerCase()} systems.</p>
-                                <div className="text-[10px] font-black uppercase tracking-widest text-mp-red flex items-center gap-1 group-hover:gap-2 transition-all">
-                                    OPEN HUB <ChevronRight size={12} />
-                                </div>
-                            </div>
-                        ))}
-                    </div>
                 </div>
             </section>
 

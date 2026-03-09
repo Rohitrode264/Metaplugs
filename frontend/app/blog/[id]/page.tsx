@@ -63,7 +63,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ id: s
 
             <article className="relative">
                 {/* ── TOP HEADER SECTION ─────────────────────────────────── */}
-                <div className="bg-white pt-16 md:pt-24 pb-16 md:pb-24 border-b border-red-50">
+                <div className="bg-white pt-8 md:pt-12 pb-16 md:pb-24 border-b border-red-50">
                     <div className="max-w-4xl mx-auto px-6 text-center">
                         {/* Navigation Back */}
                         <Link href="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-mp-red text-[10px] font-black uppercase tracking-widest mb-10 transition-colors group">
@@ -133,9 +133,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ id: s
                 )}
 
                 {/* ── CONTENT BODY ───────────────────────────────────────── */}
-                <div className="max-w-4xl mx-auto px-6 py-20 md:py-32">
+                <div className="max-w-4xl mx-auto px-6 pt-12 md:pt-16 pb-20 md:pb-32">
                     {post.excerpt && (
-                        <div className="mb-16">
+                        <div className="mb-10">
                             <p className="text-xl md:text-2xl font-medium text-gray-600 leading-relaxed italic border-l-4 border-mp-red pl-8">
                                 {post.excerpt}
                             </p>
