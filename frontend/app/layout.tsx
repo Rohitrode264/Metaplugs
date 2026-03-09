@@ -32,6 +32,25 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
+      <head>
+        <style dangerouslySetInnerHTML={{
+          __html: `
+          :root {
+            --color-mp-red: #dc2626;
+            --color-mp-black: #0a0a0a;
+          }
+          body {
+            background-color: #ffffff;
+            color: #0a0a0a;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-inter), sans-serif;
+          }
+          .hero-gradient {
+            background: radial-gradient(circle at 20% 30%,#fef2f2 0%,transparent 70%);
+          }
+        `}} />
+      </head>
       <body className="antialiased">
         {children}
       </body>

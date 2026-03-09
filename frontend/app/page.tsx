@@ -1,12 +1,11 @@
-'use client';
-
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import BlogCard from '@/components/BlogCard';
+import NewsTicker from '@/components/NewsTicker';
+import NewsletterForm from '@/components/NewsletterForm';
 import { createClient } from '@/lib/supabaseClient';
-import { ArrowRight, Zap, Globe, Shield, DollarSign, Rocket, Crown, Newspaper } from 'lucide-react';
+import { ArrowRight, Zap, Shield, DollarSign, Rocket, Crown } from 'lucide-react';
 
 const CATEGORIES_CONFIG = [
   { label: 'World AI Tech', icon: Zap, color: '#dc2626', description: 'Artificial Intelligence shaping the world' },
@@ -16,21 +15,11 @@ const CATEGORIES_CONFIG = [
   { label: 'World Unicorn', icon: Crown, color: '#7f1d1d', description: 'Billion-dollar companies & beyond' },
 ];
 
-function timeAgo(dateStr: string) {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 60) return `${mins}m ago`;
-  const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  return `${days}d ago`;
-}
-
 interface Post {
   id: string;
   title: string;
   excerpt?: string;
-  cover_image?: string;
+  cover_image_url?: string;
   created_at: string;
   post_type?: string;
   categories?: { title: string; slug?: string } | null;
@@ -43,76 +32,61 @@ interface CategorySection {
   slug: string;
 }
 
-export default function HomePage() {
-  const [heroPost, setHeroPost] = useState<Post | null>(null);
-  const [featuredPosts, setFeaturedPosts] = useState<Post[]>([]);
-  const [tickerPosts, setTickerPosts] = useState<Post[]>([]);
-  const [categorySections, setCategorySections] = useState<CategorySection[]>([]);
-  const [latestNews, setLatestNews] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
+export default async function HomePage() {
+  const supabase = createClient();
 
-  useEffect(() => {
-    fetchAll();
-  }, []);
-
-  const fetchAll = async () => {
-    const supabase = createClient();
-
-    const { data: latestPosts } = await supabase
+  // Fetch all parallel to improve speed
+  const [
+    { data: latestPosts },
+    { data: newsData },
+    { data: cats }
+  ] = await Promise.all([
+    supabase
       .from('posts')
       .select('*, categories(title, slug), profiles(full_name)')
       .eq('status', 'published')
       .order('created_at', { ascending: false })
-      .limit(20);
-
-    const posts: Post[] = latestPosts || [];
-
-    if (posts.length > 0) {
-      setHeroPost(posts[0]);
-      setFeaturedPosts(posts.slice(1, 4));
-      setTickerPosts(posts.slice(0, 10));
-    }
-
-    const { data: newsData } = await supabase
+      .limit(20),
+    supabase
       .from('posts')
       .select('*, categories(title, slug), profiles(full_name)')
       .eq('status', 'published')
       .eq('post_type', 'news')
       .order('created_at', { ascending: false })
-      .limit(6);
-
-    setLatestNews(newsData || []);
-
-    const { data: cats } = await supabase
+      .limit(6),
+    supabase
       .from('categories')
       .select('id, title, slug')
-      .order('title');
+      .order('title')
+  ]);
 
-    if (cats) {
-      const sections: CategorySection[] = [];
-      for (const cat of cats) {
-        const config = CATEGORIES_CONFIG.find(c =>
-          c.label.toLowerCase().includes(cat.title.toLowerCase().split(' ').pop() || '') ||
-          cat.title.toLowerCase().includes(c.label.toLowerCase().split(' ').pop() || '')
-        ) || CATEGORIES_CONFIG[0];
+  const posts: Post[] = latestPosts || [];
+  const heroPost = posts.length > 0 ? posts[0] : null;
+  const featuredPosts = posts.slice(1, 4);
+  const tickerPosts = posts.slice(0, 10);
+  const latestNews = newsData || [];
 
-        const { data: catPosts } = await supabase
-          .from('posts')
-          .select('*, categories(title, slug), profiles(full_name)')
-          .eq('category_id', cat.id)
-          .eq('status', 'published')
-          .order('created_at', { ascending: false })
-          .limit(4);
+  const categorySections: CategorySection[] = [];
+  if (cats) {
+    for (const cat of cats) {
+      const config = CATEGORIES_CONFIG.find(c =>
+        c.label.toLowerCase().includes(cat.title.toLowerCase().split(' ').pop() || '') ||
+        cat.title.toLowerCase().includes(c.label.toLowerCase().split(' ').pop() || '')
+      ) || CATEGORIES_CONFIG[0];
 
-        if (catPosts && catPosts.length > 0) {
-          sections.push({ category: { ...config, label: cat.title }, posts: catPosts, slug: cat.slug || cat.id });
-        }
+      const { data: catPosts } = await supabase
+        .from('posts')
+        .select('*, categories(title, slug), profiles(full_name)')
+        .eq('category_id', cat.id)
+        .eq('status', 'published')
+        .order('created_at', { ascending: false })
+        .limit(4);
+
+      if (catPosts && catPosts.length > 0) {
+        categorySections.push({ category: { ...config, label: cat.title }, posts: catPosts, slug: cat.slug || cat.id });
       }
-      setCategorySections(sections);
     }
-
-    setLoading(false);
-  };
+  }
 
   return (
     <div className="min-h-screen bg-[#FFF8F8]">
@@ -126,22 +100,22 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.03] pointer-events-none" aria-hidden="true" />
 
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center md:text-left">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-mp-red/5 border border-mp-red/10 rounded-full text-mp-red text-[10px] font-black uppercase tracking-[0.2em] mb-8 animate-in fade-in duration-500">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-mp-red/5 border border-mp-red/10 rounded-full text-mp-red text-[10px] font-black uppercase tracking-[0.2em] mb-8">
               <span className="w-1.5 h-1.5 bg-mp-red rounded-full shadow-[0_0_8px_#dc2626]" aria-hidden="true" />
               Live Global Intelligence
             </div>
 
-            <h1 id="hero-heading" className="text-5xl md:text-8xl font-black text-mp-black leading-[0.95] tracking-tighter mb-8 font-playfair animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <h1 id="hero-heading" className="text-5xl md:text-8xl font-black text-mp-black leading-[0.95] tracking-tighter mb-8 font-playfair">
               DECODING THE <br />
               <span className="text-mp-red underline decoration-mp-red/10 underline-offset-8">WORLD'S SIGNALS.</span>
             </h1>
 
-            <p className="max-w-2xl text-gray-500 text-lg md:text-xl font-medium leading-relaxed mb-12 animate-in fade-in slide-in-from-bottom-6 duration-700">
+            <p className="max-w-2xl text-gray-500 text-lg md:text-xl font-medium leading-relaxed mb-12">
               From battlefield AI and defence tech to startup unicorns and global finance.
               Metaplugs provides high-fidelity intelligence to navigate the next era.
             </p>
 
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 animate-in fade-in slide-in-from-bottom-8 duration-700">
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
               <Link href="/news" className="group flex items-center gap-2 px-8 py-4 bg-mp-red hover:bg-mp-red-dark text-white font-black text-sm uppercase tracking-widest rounded-xl transition-all shadow-xl shadow-mp-red/20 hover:-translate-y-1" aria-label="View latest news alerts">
                 Latest Alerts <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" aria-hidden="true" />
               </Link>
@@ -153,26 +127,7 @@ export default function HomePage() {
         </section>
 
         {/* ── BREAKING NEWS TICKER ───────────────────────────────── */}
-        {tickerPosts.length > 0 && (
-          <aside className="relative z-20 flex bg-mp-red py-2 overflow-hidden items-center group" aria-label="Breaking News Ticker">
-            <div className="px-6 py-2 bg-mp-black text-white text-[10px] font-black tracking-widest uppercase italic skew-x-[-15deg] ml-[-1rem] relative z-30 shadow-2xl">
-              <span className="inline-block skew-x-[15deg] px-4 italic animate-pulse" aria-hidden="true">BREAKING</span>
-            </div>
-            <div className="flex-1 overflow-hidden relative">
-              <div className="flex whitespace-nowrap animate-ticker group-hover:pause">
-                {[...tickerPosts, ...tickerPosts].map((post, i) => (
-                  <Link
-                    key={`${post.id}-${i}`}
-                    href={`/blog/${post.id}`}
-                    className="inline-flex items-center gap-4 px-10 text-xs md:text-sm font-bold text-white uppercase tracking-wider hover:underline"
-                  >
-                    <span className="text-white/40 font-black" aria-hidden="true">/</span> {post.title}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </aside>
-        )}
+        <NewsTicker tickerPosts={tickerPosts} />
 
         {/* ── EDITOR'S PICKS ──────────────────────────────────────── */}
         <section className="py-24 bg-white border-b border-red-50" aria-labelledby="featured-heading">
@@ -197,21 +152,7 @@ export default function HomePage() {
               </div>
               <div className="lg:col-span-4 flex flex-col gap-6">
                 {featuredPosts.map(p => <BlogCard key={p.id} post={p} variant="compact" />)}
-                <div className="mt-auto bg-[#FFF8F8] rounded-2xl p-8 border border-red-100 shadow-sm transition-transform hover:-translate-y-1 duration-300">
-                  <h3 className="font-black text-mp-black text-sm mb-3">Want the full picture?</h3>
-                  <p className="text-gray-500 text-xs mb-6 leading-relaxed">Join 50k+ readers getting surgical-grade intelligence delivered daily.</p>
-                  <form className="space-y-3" onSubmit={(e) => e.preventDefault()}>
-                    <input
-                      type="email"
-                      placeholder="Email Address"
-                      aria-label="Email Address for Newsletter"
-                      className="w-full px-4 py-3 bg-white border border-red-100 rounded-xl text-xs focus:ring-1 focus:ring-mp-red focus:border-mp-red outline-none transition-all"
-                    />
-                    <button className="w-full py-3 bg-mp-black text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-mp-red transition-all shadow-lg active:scale-95">
-                      JOIN NEWSLETTER
-                    </button>
-                  </form>
-                </div>
+                <NewsletterForm variant="side" />
               </div>
             </div>
           </div>
@@ -236,11 +177,10 @@ export default function HomePage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {latestNews.slice(0, 3).map((post, idx) => (
+              {latestNews.slice(0, 3).map((post) => (
                 <div
                   key={post.id}
-                  className="h-full animate-in fade-in slide-in-from-bottom-4 duration-500"
-                  style={{ animationDelay: `${idx * 100}ms` }}
+                  className="h-full"
                 >
                   <BlogCard post={post} />
                 </div>
@@ -262,17 +202,7 @@ export default function HomePage() {
             <p className="text-gray-500 text-lg md:text-xl font-medium mb-12 max-w-2xl mx-auto">
               Get 3 surgical-grade intelligence briefs every week directly in your inbox.
             </p>
-            <form className="flex flex-col md:flex-row gap-4 max-w-md mx-auto" onSubmit={(e) => e.preventDefault()}>
-              <input
-                type="email"
-                placeholder="YOUR.EMAIL@WORK.COM"
-                aria-label="Email Address for Global Newsletter"
-                className="flex-1 px-6 py-4 bg-white border border-red-100 rounded-xl text-mp-black font-bold placeholder:text-gray-400 focus:outline-none focus:border-mp-red transition-all text-sm shadow-sm"
-              />
-              <button className="px-8 py-4 bg-mp-red text-white font-black text-sm uppercase tracking-widest rounded-xl hover:bg-mp-red-dark transition-all shadow-xl shadow-mp-red/10 active:scale-95">
-                SUBSCRIBE
-              </button>
-            </form>
+            <NewsletterForm />
           </div>
         </section>
       </main>

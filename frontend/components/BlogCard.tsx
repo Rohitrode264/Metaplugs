@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Calendar, Clock, Tag, ArrowRight } from 'lucide-react';
 
 interface BlogCardProps {
@@ -35,9 +36,11 @@ export default function BlogCard({ post, variant = 'default' }: BlogCardProps) {
         return (
             <Link href={`/blog/${post.id}`} className="relative h-[400px] md:h-[500px] w-full block group overflow-hidden rounded-3xl bg-mp-black">
                 {post.cover_image_url ? (
-                    <img
+                    <Image
                         src={post.cover_image_url}
                         alt={post.title}
+                        fill
+                        priority
                         className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105 opacity-80"
                     />
                 ) : (
@@ -68,9 +71,9 @@ export default function BlogCard({ post, variant = 'default' }: BlogCardProps) {
     if (variant === 'compact') {
         return (
             <Link href={`/blog/${post.id}`} className="flex items-center gap-4 group py-3 border-b border-gray-100 last:border-0">
-                <div className="w-20 h-16 md:w-24 md:h-20 flex-shrink-0 bg-gray-100 rounded-xl overflow-hidden shadow-sm">
+                <div className="w-20 h-16 md:w-24 md:h-20 flex-shrink-0 bg-gray-100 rounded-xl overflow-hidden shadow-sm relative">
                     {post.cover_image_url ? (
-                        <img src={post.cover_image_url} alt={post.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+                        <Image src={post.cover_image_url} alt={post.title} fill className="object-cover group-hover:scale-110 transition-transform duration-300" />
                     ) : (
                         <div className="w-full h-full bg-mp-red/5 flex items-center justify-center text-mp-red/30">
                             <Tag size={20} />
@@ -101,13 +104,12 @@ export default function BlogCard({ post, variant = 'default' }: BlogCardProps) {
             >
                 <div className="aspect-[16/10] w-full overflow-hidden relative bg-gray-100">
                     {post.cover_image_url ? (
-                        <img
+                        <Image
                             src={post.cover_image_url}
                             alt=""
-                            aria-hidden="true"
-                            loading="lazy"
-                            decoding="async"
-                            className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-110"
+                            fill
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                            className="object-cover object-top transition-transform duration-500 group-hover:scale-110"
                         />
                     ) : (
                         <div className="w-full h-full bg-gradient-to-br from-red-50 to-white flex items-center justify-center text-red-100">
